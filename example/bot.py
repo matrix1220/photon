@@ -1,32 +1,27 @@
-from config import bot
-from dbscheme import User, session
-import photon, scenario
+import config, router, photon, scenario
 
-async def handle(update):
-	try:
-		_response = await main(update) # photon.handle
-	finally:
-		session.commit()
-	return _response
+from photon import handle
 
-async def main(update):
-	if message := update.message:
-		chat = message.chat
-		if chat.type == "private":
-			user = User.find(chat.id)
-			#user.update = update
+#handle = photon.handle
 
-			return await user.handle_message(message)
-		elif chat.type in ["group", "supergroup"]:
-			user = User.find(message['from'].id)
-			#group = _globals.Group.find(chat.id)
+#handle_as_response
 
-			return await user.handle_message(message)
+# async def handle(update):
+# 	if message := update.message:
+# 		chat = message.chat
+# 		if chat.type == "private":
+# 			router = globals_.find_router(user_id=chat.id)
+# 			return await router.handle_message(message)
+# 		# elif chat.type in ["group", "supergroup"]:
+# 		# 	router = find_router(user_id=chat.id)
+# 		# 	#group = globals_.Group.find(chat.id)
 
-	elif callback_query := update.callback_query:
-		user = User.find(callback_query['from'].id)
-		if not user:
-			return _globals.bot.answerCallbackQuery(callback_query.id)
-		return await user.handle_callback(callback_query)
+# 		# 	return await user.handle_message(message)
+
+# 	elif callback_query := update.callback_query:
+# 		router = globals_.find_router(user_id=callback_query['from'].id, message_id=123)
+# 		if not router:
+# 			return globals_.bot.answerCallbackQuery(callback_query.id)
+# 		return await router.handle_callback(callback_query)
 
 

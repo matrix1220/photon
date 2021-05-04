@@ -1,6 +1,5 @@
-from . import Request
+from .request import Request
 import asyncio
-
 
 def keyboard_helper(data):
 	for x in ['keyboard', 'inline_keyboard', 'remove_keyboard']:
