@@ -9,14 +9,9 @@ def keyboard_helper(data):
 			del data[x]
 
 class sendMessage(Request):
-	def __init__(self, bot, chat_id, message, **kwargs):
+	def __init__(self, bot, message, chat_id = "{chat_id}", **kwargs):
 		keyboard_helper(kwargs)
 		Request.__init__(self, bot, "sendMessage", {"chat_id":chat_id, "text":message, **kwargs})
-
-class sendVideo(Request):
-	def __init__(self, bot, chat_id, message, **kwargs):
-		keyboard_helper(kwargs)
-		Request.__init__(self, bot, "sendVideo", {"chat_id":chat_id, "video":message, **kwargs})
 
 class queuedSendMessage(sendMessage):
 	def __init__(self, bot, chat_id, message, **kwargs):

@@ -48,7 +48,9 @@ class User(Base):
 	id = Column(Integer, primary_key=True)
 	menu_stack = Column(MenuStack.as_mutable(JSONEncoded), nullable=False, default=[])
 	menu_arguments = Column(MutableObject.as_mutable(JSONEncoded))
+	keyboard = Column(MutableDict.as_mutable(JSONEncoded))
 	language = Column(Integer)
+	last_time = Column(Integer)
 	blocked = Column(Boolean, default=False)
 
 

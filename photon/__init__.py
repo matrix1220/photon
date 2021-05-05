@@ -1,8 +1,6 @@
 
 
 from .client import inline_button as _inline_button
-from .client import Request, Bot
-
 from . import globals_
 
 
@@ -13,7 +11,10 @@ async def handle(update):
 		chat = message.chat
 		if chat.type == "private":
 			router = globals_.find_router(user_id=chat.id)
-			return await router.handle_message(message)
+			result = await router.handle_message(message)
+			if isinstance(result, Request):
+				result.feed(chat_id=chat.id)
+			return result
 		# elif chat.type in ["group", "supergroup"]:
 		# 	router = find_router(user_id=chat.id)
 		# 	#group = globals_.Group.find(chat.id)

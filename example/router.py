@@ -13,7 +13,8 @@ def find_router(user_id):
 		db.add(user)
 		db.commit()
 
-	router = Router(user.menu_stack, user=user, db=db)
+	kwargs = dict(user=user, db=db)
+	router = Router(user.menu_stack, user.keyboard, kwargs)
 
 	return router
 

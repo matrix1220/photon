@@ -1,4 +1,4 @@
-
+from ..utils import format
 
 class Request(Exception):
 	def __init__(self, bot, method, kwargs):
@@ -6,8 +6,8 @@ class Request(Exception):
 		self.method = method
 		self.data = kwargs
 
-	def feed(self, data):
-		pass
+	def feed(self, **kwargs):
+		self.data = format(self.data, **kwargs)
 
 	async def exec(self):
 		return await self.bot._send(self.method, self.data)
