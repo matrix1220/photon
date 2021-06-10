@@ -1,4 +1,4 @@
-
+import asyncio, time
 
 class QueuedMessage:
 	def __init__(self, message, sender=None):
@@ -6,7 +6,7 @@ class QueuedMessage:
 		self.sender = sender
 		self.next = None
 
-# class MessagePriorityQueue:
+# class PriorityMessageQueue:
 # 	def __init__(self):
 # 		self.first_message = None
 # 		self.message_priorities_last = defaultdict()
@@ -34,7 +34,7 @@ class QueuedMessage:
 # 			if queued_message.sender!=None:
 # 				queued_message.sender.receive(result)
 # 			self.first_message = queued_message.next
-import asyncio, time
+
 class MessageQueue:
 	def __init__(self, bot):
 		self.bot = bot

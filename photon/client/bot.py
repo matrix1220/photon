@@ -8,15 +8,17 @@ import asyncio
 import logging
 logger = logging.getLogger(__name__)
 
+#from . import methods_
+
 class Bot:
 	def __init__(self, token):
-		self._token = token
+		self.token = token
 		self.message_queue = MessageQueue(self)
-
+		self.session = requests.Session()
 
 	async def _send(self, method, args={}):
 		logger.debug([method, args])
-		result = await requests.post('https://api.telegram.org/bot' + self._token + '/' + method, json=args)
+		result = await self.session.post('https://api.telegram.org/bot' + self.token + '/' + method, json=args)
 		data = objectify(result.json())
 		logger.debug(data)
 
@@ -29,49 +31,37 @@ class Bot:
 		if not response: return
 		return await self._send(response.pop('method'), response)
 
-	async def long_polling(self, handler=None, skip_updates=True):
+	async def long_polling(self, skip_updates=True):
 		offset = None
 		if skip_updates:
-			while offset==None:
-				offset = await self._handle_updates(handler, offset=-1, timeout=30)
+			kwargs = dict(offset=-1, timeout=30)
 		else:
-			while offset==None:
-				offset = await self._handle_updates(handler, timeout=30)
+			kwargs = dict(timeout=30)
+
+		while offset==None:
+			async for update in self.safeGetUpdates(**kwargs):
+				offset = update.update_id
+				yield update
 
 		while True:
-			tmp = await self._handle_updates(handler, offset=offset + 1, timeout=30)
-			if tmp: offset = tmp
+			async for update in self.safeGetUpdates(offset=offset + 1, timeout=30):
+				offset = update.update_id
+				yield update
 
-		# for update in await self.getUpdates(offset=-1):
-		# 	offset = update.update_id
-
-	async def _handle_updates(self, handler, **kwargs):
-		offset = None
+	async def safeGetUpdates(self, **kwargs):
 		try:
 			updates = await self.getUpdates(**kwargs)
 		except Exception as e:
-			logging.exception(e)
+			logger.exception(e)
+			await asyncio.sleep(1)
 			return 
 
 		for update in updates:
-			offset = update.update_id
-			asyncio.create_task(self._handle_update(handler, update))
-			
-
-		return offset
-
-	async def _handle_update(self, handler, update):
-		try:
-			temp = await handler(update)
-			if not temp: return
-			if not isinstance(temp, Request): return
-			await temp
-		except Exception as e:
-			logging.exception(e)
+			yield update
 
 
 	def __getattr__(self, key):
-		def function(*args, **kwargs):
-			return request(self, key, args, kwargs)
-		return function
-		#return lambda *args, **kwargs: await Request(key, args, kwargs, self)
+		# def function(*args, **kwargs):
+		# 	return request(key, args, kwargs).set_bot(self)
+		# return function
+		return lambda *args, **kwargs: request(key, args, kwargs).set_bot(self)

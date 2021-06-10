@@ -46,13 +46,22 @@ class User(Base):
 	__tablename__ = 'users'
 
 	id = Column(Integer, primary_key=True)
-	menu_stack = Column(MenuStack.as_mutable(JSONEncoded), nullable=False, default=[])
+	menu_stack = Column(MenuStack.as_mutable(JSONEncoded), nullable=False, default=MenuStack())
 	menu_arguments = Column(MutableObject.as_mutable(JSONEncoded))
 	keyboard = Column(MutableDict.as_mutable(JSONEncoded))
 	language = Column(Integer)
 	last_time = Column(Integer)
 	blocked = Column(Boolean, default=False)
 
+class Message(Base): # InlineMenu
+	__tablename__ = 'messages'
+
+	chat_id = Column(Integer, primary_key=True)
+	message_id = Column(Integer, primary_key=True)
+	content = Column(MutableDict.as_mutable(JSONEncoded))
+	menu_stack = Column(MenuStack.as_mutable(JSONEncoded), nullable=False, default=MenuStack())
+	#menu_arguments = Column(MutableObject.as_mutable(JSONEncoded))
+	keyboard = Column(MutableDict.as_mutable(JSONEncoded))
 
 from config import engine
 Base.metadata.create_all(engine)

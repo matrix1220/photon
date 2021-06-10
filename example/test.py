@@ -9,5 +9,14 @@
 
 # print(methods.hello)
 
-x = ['asd', 'qwe']
-print( {y:y for y in x} )
+# x = ['asd', 'qwe']
+# print( {y:y for y in x} )
+
+# from photon.client import Bot
+# from photon.client.methods import asdads
+
+# bot = Bot("asdasd")
+
+# print(asdads(1, a='asd'))
+# print(bot.asdads(1, a='asd'))
+

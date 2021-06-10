@@ -1,4 +1,5 @@
 
+
 def format(data, **kwargs):
 	if isinstance(data, list):
 		for x, y in enumerate(data): data[x] = format(y, **kwargs)
