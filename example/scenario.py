@@ -6,6 +6,7 @@ from config import bot, languages
 
 from photon import OutlineMenu, InlineMenu
 from photon.objects import Message
+from photon import key, act, explicit_act
 
 #from photon.methods import sendMessage
 
@@ -21,57 +22,13 @@ import asyncio
 # 		super().__init__(
 # 			[Button(self.context.language.help), Button(self.context.language.about)]
 # 		)
-		
-
-@bot.set_main_menu
-class MainMenu(OutlineMenu):
-	keyboard = [
-		# Button([Format,"str"], [key, menu, trigger])
-		[ ("Button1", "button1") ],
-		[ ("Test Menu", "testmenu") ],
-	]
-	parse_pattern = [
-		("/start {arg}", "start"),
-		("/id{id}", "start")
-	]
-	async def act(self, arg=None):
-		#if user.language==None: return manager.act(SelectLanguage)()
-		return Message(f'Main Menu, arg={arg}')
-		# return Message('test bot', keyboard=keyboard)
-	async def handle_keyboard_button1(self):
-		return Message(f'Button1')
-	async def handle_keyboard_testmenu(self):
-
-		#return TestMenu.act("data")
-		#return TestMenu(self.context).act("data")
-		return await self.context.act(TestMenu)
-		#return TestMenu.explicit_act(asdasd)
-	async def handle_text(self, text):
-		# return bot.sendMessage(self.user.id, 'asdasd')
-		# bot.queuedSendMessage(self.user.id, str(x) + 'a')
-		# await sendMessage(self.user.id, 'end')
-		# if text == "/testmenu":
-		# 	return await self.context.act(TestMenu)
-		pass
-
-class TestMenu(OutlineMenu): # OutlineMenu InlineMenu
-	keyboard = [
-		[ ("Button2", "button2") ],
-		[ ("Back", "back") ],
-	]
-	async def act(self):
-		return Message('Test Menu')
-	async def handle_keyboard_button2(self):
-		return await self.context.act(TestMenu2)
-	async def handle_keyboard_back(self):
-		return await self.context.back()
 
 class TestMenu2(InlineMenu): # OutlineMenu InlineMenu
 	keyboard = [
-		[ ("Button2", "button2") ],
-		[ ("Back", "back") ],
+		[ ("Button2", key("button2")) ],
+		[ ("Back", key("back")) ],
 	]
-	async def act(self):
+	async def act_(self):
 		#keyboard = self.set_keyboard()
 		return Message('Test Menu 2')
 	async def handle_keyboard_button2(self):
@@ -81,6 +38,46 @@ class TestMenu2(InlineMenu): # OutlineMenu InlineMenu
 
 	async def handle_text(self, text):
 		pass
+
+class TestMenu(InlineMenu): # OutlineMenu InlineMenu
+	keyboard = [
+		[ ("Button2", act(TestMenu2)) ],
+		[ ("Back", key("back")) ],
+	]
+	async def act_(self):
+		return Message('Test Menu')
+	async def handle_keyboard_back(self):
+		return await self.context.back()	
+
+@bot.set_main_menu
+class MainMenu(OutlineMenu):
+	keyboard = [
+		# Button([Format,"str"], [key, menu, trigger])
+		[ ("Button1", key("button1")) ],
+		[ ("Test Menu", act(TestMenu)) ],
+	]
+	parse_pattern = [
+		("/start {arg}", "start"),
+		("/id{id}", "start")
+	]
+	async def act_(self, arg=None):
+		#if user.language==None: return manager.act(SelectLanguage)()
+		return Message(f'Main Menu, arg={arg}')
+		# return Message('test bot', keyboard=keyboard)
+	async def handle_keyboard_button1(self):
+		return "Button1"
+
+	async def handle_text(self, text):
+		# return bot.sendMessage(self.user.id, 'asdasd')
+		# bot.queuedSendMessage(self.user.id, str(x) + 'a')
+		# await sendMessage(self.user.id, 'end')
+		# if text == "/testmenu":
+		# 	return await self.context.act(TestMenu)
+		pass
+
+
+
+
 
 
 

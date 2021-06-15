@@ -8,8 +8,6 @@ from photon import Context as Context_
 #from photon import OutlineMenuContext as OutlineMenuContext_
 from photon import OutlineMenuContext
 from photon import InlineMenuContext as InlineMenuContext_
-from photon.catch import Done
-from photon.menu.menu_context import MenuContext
 
 
 # class OutlineMenuContext(OutlineMenuContext_):

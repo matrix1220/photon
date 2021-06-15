@@ -32,11 +32,12 @@ sessionmaker = _sessionmaker(bind=engine)
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 # logging.getLogger('sqlalchemy').setLevel(logging.DEBUG)
 
-import photon
+
 if debug:
 	_token = "305643264:AAGwALg3QDiH2OrNzqehgoPdeXwpIqY416c" # dynamic_config.debug_token
 else:
 	_token = dynamic_config.production_token
 
+from photon import Bot
 from context import ContextManager
-bot = photon.Bot(_token, context_manager=ContextManager())
+bot = Bot(_token, context_manager=ContextManager())

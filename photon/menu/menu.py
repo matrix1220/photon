@@ -29,13 +29,27 @@ class Menu:
 
 	async def act(self, *args, **kwargs):
 		result = await catch(self._act, *args, **kwargs)
+		if result==None:
+			result = await catch(self.act_, *args, **kwargs)
+			self.context.menu_stack.push(self.id, args, kwargs)
 		return self.complete_result(result)
 
-	# async def _act(self):
-	# 	pass
+	async def explicit_act(self, *args, **kwargs):
+		result = await catch(self._act, *args, **kwargs)
+		if result==None:
+			result = await catch(self.act_, *args, **kwargs)
+			self.context.menu_stack.set_current(self.id, args, kwargs)
+		return self.complete_result(result)
 
-	# async def act_(self):
-	# 	pass
+	async def _act(self, *args, **kwargs):
+		pass
+
+	async def act_(self, *args, **kwargs):
+		pass
+
+	async def handle_keyboard(self, key, *args, **kwargs):
+		if hasattr(self, f"handle_keyboard_{key}"):
+			return await getattr(self, f"handle_keyboard_{key}")(*args, **kwargs)
 
 	# def keyboard(self, keyboard = None):
 	# 	if keyboard == None:
@@ -43,6 +57,7 @@ class Menu:
 	# 	return keyboard
 
 	def complete_result(self, result):
+		print(result)
 		if isinstance(result, Result):
 			result.arg = self.complete_request(result.arg)
 		else:

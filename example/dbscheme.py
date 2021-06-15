@@ -48,7 +48,7 @@ class User(Base):
 	id = Column(Integer, primary_key=True)
 	menu_stack = Column(MenuStack.as_mutable(JSONEncoded), nullable=False, default=MenuStack())
 	menu_arguments = Column(MutableObject.as_mutable(JSONEncoded))
-	keyboard = Column(MutableDict.as_mutable(JSONEncoded))
+	keyboard = Column(MutableDict.as_mutable(JSONEncoded), default={})
 	language = Column(Integer)
 	last_time = Column(Integer)
 	blocked = Column(Boolean, default=False)
@@ -61,7 +61,8 @@ class Message(Base): # InlineMenu
 	content = Column(MutableDict.as_mutable(JSONEncoded))
 	menu_stack = Column(MenuStack.as_mutable(JSONEncoded), nullable=False, default=MenuStack())
 	#menu_arguments = Column(MutableObject.as_mutable(JSONEncoded))
-	keyboard = Column(MutableDict.as_mutable(JSONEncoded))
+	keyboard = Column(MutableDict.as_mutable(JSONEncoded), default={})
+	sent_at = Column(Integer)
 
 from config import engine
 Base.metadata.create_all(engine)

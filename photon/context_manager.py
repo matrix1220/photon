@@ -3,10 +3,11 @@
 from .menu import InlineMenuContext, OutlineMenuContext
 from .menu import Mode
 
-from .context_properties import ContextProperties, MenuContextProperties
+#from .context_properties import ContextProperties, MenuContextProperties
 
 
-context_properties = {}
+#context_properties = {}
+contexts = {}
 
 class MenuContextManager:
 	def switch_menu_mode(self, context):
@@ -45,30 +46,30 @@ class ContextManager(MenuContextManager):
 
 	# 	return self.instantiate(OutlineMenuContext, metadata)
 
-	def find(self, metadata):
-		if "chat_id" not in metadata: return
-		chat_id = metadata['chat_id']
+	# def find(self, metadata):
+	# 	if "chat_id" not in metadata: return
+	# 	chat_id = metadata['chat_id']
 
-		if "message_id" in metadata:
-			message_id = metadata['message_id']
+	# 	if "message_id" in metadata:
+	# 		message_id = metadata['message_id']
 
-			key = f"chat_id:{chat_id}:message_id:{message_id}"
-			if key in context_properties:
-				return context_properties[key]
+	# 		key = f"chat_id:{chat_id}:message_id:{message_id}"
+	# 		if key in context_properties:
+	# 			return context_properties[key]
 
-			context_properties_ = MenuContextProperties(metadata)
+	# 		context_properties_ = MenuContextProperties(metadata)
 
-			#context_properties[key] = context_properties_
-			return context_properties_
+	# 		#context_properties[key] = context_properties_
+	# 		return context_properties_
 
-		key = f"chat_id:{chat_id}"
-		if key in context_properties:
-			return context_properties[key]
+	# 	key = f"chat_id:{chat_id}"
+	# 	if key in context_properties:
+	# 		return context_properties[key]
 
-		context_properties_ = MenuContextProperties(metadata)
+	# 	context_properties_ = MenuContextProperties(metadata)
 
-		context_properties[key] = context_properties_
-		return context_properties_
+	# 	context_properties[key] = context_properties_
+	# 	return context_properties_
 
 	# def save(self, context_properties_):
 	# 	metadata = context_properties_.metadata
