@@ -9,48 +9,36 @@ from .menu import menu_classes
 from .mode import Inline, Outline, Mode
 
 #from .menu_stack import MenuStack
-#from .register import Act, ExplicitAct
 
-
-		# if isinstance(result, Request) or isinstance(result, Done):
-		# 	raise Act(menu_class, result.arg, args, kwargs)
-		# elif isinstance(result, Incorrect):
-		# 	raise result.arg
 # abstract class;
 class MenuContext(Context):
-	async def reset(self, menu_class, *args, **kwargs):
-		self.menu_stack.reset()
-		return await self.explicit_act(menu_class, *args, **kwargs)
-
 	def switch_mode(self, metadata):
 		#dict(chat_id=self.metadata['chat_id'], message_id=None)
-		return self.manager.find(metadata)
+		context = self.manager.find(metadata)
+		self._append_commit_list(context)
+		return context
 		#return self.opposite.switch_from(self)
 
-	# async def forward(self, menu_class, *args, **kwargs):
-	# 	#assert isinstance(menu_class, type), "menu class required"
-	# 	#assert issubclass(menu_class, Menu), "asd"
+	def _check_mode(self, menu_class):
+		if self.mode!=menu_class.mode:
+			return self.switch_mode()
 
-	# 	menu_object = self.instantiate(menu_class)
-	# 	result = await menu_object.act(*args, **kwargs)
-	# 	#result = menu_object.complete_result(result)
-	# 	return result
+		return self
 
 	async def act(self, menu_class, *args, **kwargs):
-		if self.mode!=menu_class.mode:
-			context = self.switch_mode()
-			return await context.act(menu_class, *args, **kwargs)
-
-		menu_object = self.instantiate(menu_class)
-		return await menu_object.act(*args, **kwargs)
+		context = self._check_mode(menu_class)
+		menu_object = menu_class(context)
+		return await menu_object.act(*args, *kwargs)
 
 	async def explicit_act(self, menu_class, *args, **kwargs):
-		if self.mode!=menu_class.mode:
-			context = self.switch_mode()
-			return await context.explicit_act(menu_class, *args, **kwargs)
+		context = self._check_mode(menu_class)
+		menu_object = menu_class(context)
+		return await menu_object.explicit_act(*args, *kwargs)
 
-		menu_object = self.instantiate(menu_class)
-		return await menu_object.explicit_act(*args, **kwargs)
+	async def reset(self, menu_class, *args, **kwargs):
+		context = self._check_mode(menu_class)
+		menu_object = menu_class(context)
+		return await menu_object.reset(*args, *kwargs)
 
 	async def _back(self):
 		pass
@@ -62,16 +50,7 @@ class MenuContext(Context):
 		menu_class, args, kwargs = self.menu_stack.current()
 		return await self.explicit_act(menu_class, *args, **kwargs)
 
-	async def handle_keyboard(self, key, menu_object=None):
-		key_, target, args, kwargs = key
-		if key_==0:
-			if menu_object==None:
-				menu_object = self.instantiate(self.menu_stack.current_menu())
-			return await menu_object.handle_keyboard(target, *args, **kwargs)
-		elif key_==1:
-			return await self.act(menu_classes[target], *args, **kwargs)
-		elif key_==2:
-			return await self.explicit_act(menu_classes[target], *args, **kwargs)
+	
 
 class OutlineMenuContext(Outline, MenuContext):
 	async def main_menu(self, arg=None):
@@ -90,37 +69,30 @@ class OutlineMenuContext(Outline, MenuContext):
 		if self.menu_stack.empty():
 			return await self.main_menu()
 
-		menu_object = self.instantiate(self.menu_stack.current_menu())
+		menu_object = self.instantiate(*self.menu_stack.current())
+		#menu_object = None
 
 		if text:=message.text:
 			if self.keyboard!=None and text in self.keyboard:
 				key = self.keyboard[text]
-				result = await self.handle_keyboard(key, menu_object)
+				result = await menu_object.handle_keyboard(key)
 				#return result
 				if result!=False: return result
 
 		for x in ['text', 'video']:
 			if x not in message: continue
-			return await getattr(menu_object, f"handle_{x}")(message[x])
+			result = await menu_object.handle(x, message[x])
+			if result!=False: return result
+			#break
 
 		return await menu_object.handle_message(message)
-	
-	# async def set_outline_keyboard(self, keyboard):
-	# 	# if keyboard==None: keyboard = self.menu_stack.current_menu().keyboard
-	# 	# if keyboard==None: return self.remove_keyboard()
-	# 	self.keyboard = parse_keys(keyboard)
-	# 	# self.keyboard.clear()
-	# 	# self.keyboard.update(parse_keys(keyboard))
-	# 	return {"keyboard":parse_values(keyboard)}
-	# async def remove_outline_keyboard(self):
-	# 	self.keyboard = None
-	# 	return {"remove_keyboard":True}
 
 class InlineMenuContext(Inline, MenuContext):
 	async def _back(self):
 		pass
 		#return await self.main_menu()
 	def __init__(self):
+		super().__init__()
 		self.incomplete = False
 
 	def switch_mode(self):
@@ -136,43 +108,15 @@ class InlineMenuContext(Inline, MenuContext):
 		self.set_message_id(message_id)
 		self.incomplete = False
 
-
-	async def act(self, menu_class, *args, **kwargs):
-		if self.mode!=menu_class.mode:
-			context = self.switch_mode()
-			return await context.act(menu_class, *args, **kwargs)
-
-		result = await MenuContext.act(self, menu_class, *args, **kwargs)
-		if self.incomplete:
-			# bug here
-			#if not isinstance(result, sendMessage): raise Exception("error")
-			self.get_message_id((await result).message_id)
-			return
-		return result
-
-	async def explicit_act(self, menu_class, *args, **kwargs):
-		if self.mode!=menu_class.mode:
-			context = self.switch_mode()
-			return await context.explicit_act(menu_class, *args, **kwargs)
-
-		result = await MenuContext.explicit_act(self, menu_class, *args, **kwargs)
-		if self.incomplete:
-			# bug here
-			#if not isinstance(result, sendMessage): raise Exception("error")
-			self.get_message_id((await result).message_id)
-			return
-		return result
-
 	async def handle_inline_menu(self, callback_query):
 		return await self.handle_inline_keyboard(callback_query.data)
-		#menu_object = self.instantiate(menu_classes[data.pop(0)])
-		#return await catch_request(handler.handle_callback, [callback_query, data])
 
 	async def handle_inline_keyboard(self, data):
-		#if not self.keyboard: return
-		key = data
-		menu_object = self.instantiate(self.menu_stack.current_menu())
-		return await self.handle_keyboard(key, menu_object)
+		if self.menu_stack.empty():
+			print("bla")
+			return
+		menu_object = self.instantiate(*self.menu_stack.current())
+		return await menu_object.handle_keyboard(data)
 
 
 # InlineMenuContext.opposite = OutlineMenuContext

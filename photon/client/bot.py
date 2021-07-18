@@ -14,11 +14,12 @@ class Bot:
 	def __init__(self, token):
 		self.token = token
 		self.message_queue = MessageQueue(self)
-		self.session = requests.Session()
+		#self.session = requests.Session()
 
 	async def _send(self, method, args={}):
 		logger.debug([method, args])
-		result = await self.session.post('https://api.telegram.org/bot' + self.token + '/' + method, json=args)
+		#self.session
+		result = await requests.post(f'https://api.telegram.org/bot{self.token}/{method}', json=args)
 		data = objectify(result.json())
 		logger.debug(data)
 

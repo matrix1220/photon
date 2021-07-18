@@ -34,7 +34,8 @@ class Bot(Bot_):
 
 	async def long_polling(self, skip_updates=True):
 		async for update in Bot_.long_polling(self, skip_updates):
-			asyncio.create_task(self._handle_update(update))
+			await self._handle_update(update)
+			#asyncio.create_task(self._handle_update(update))
 
 	async def _handle_update(self, update):
 		try:

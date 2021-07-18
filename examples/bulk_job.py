@@ -1,41 +1,29 @@
 
 
 from dbscheme import User
-class BulkSend(Menu):
+class NewBulkJob(OutlineMenu):
 	bulk_send_jobs = {} 
-	async def act(self, arg=None):
-		user.passes()
-		keyboard = [['/back']]
-		return bot.sendMessage(user.id, 'send message:', keyboard=keyboard)
+	keyboard = [[("Orqaga", back())]]
+	message = 'send message:'
+	# async def act(self):
+	# 	return Message('send message:')
 
 	async def handle_text(self, text):
-		if text == "/back":
-			return await user.back()
+		await self.exec(await self.context.act(BulkMenu, text))
+		return await self.context.back()
 
-		#session.query(User)
-		id = len(BulkSend.bulk_send_jobs)
-		keyboard = [[inline_button("pause", [BulkSend.id, id, 1]), inline_button("stop", [BulkSend.id, id, 3])]]
-		message = await sendMessage(user.id, f'wait for it', inline_keyboard=keyboard)
-		BulkSend.bulk_send_jobs[id] = BulkSendJob(message, text)
-		
-		return await user.back()
 
-	async def handle_callback(user, query, data):
-		id, action = data
-		if id not in BulkSend.bulk_send_jobs: return
-		bulk_send_job = BulkSend.bulk_send_jobs[id]
-		if action == 1:
-			bulk_send_job.pause()
-			keyboard = [[inline_button("unpause", [BulkSend.id, id, 2]), inline_button("stop", [BulkSend.id, id, 3])]]
-			bulk_send_job.base_message = await bot.editMessageReplyMarkup(user.id, query.message.message_id, inline_keyboard=keyboard)
-		elif action == 2:
-			bulk_send_job.unpause()
-			keyboard = [[inline_button("pause", [BulkSend.id, id, 1]), inline_button("stop", [BulkSend.id, id, 3])]]
-			bulk_send_job.base_message = await bot.editMessageReplyMarkup(user.id, query.message.message_id, inline_keyboard=keyboard)
-		elif action == 3:
-			bulk_send_job.stop()
-			bulk_send_job.base_message = await bot.editMessageReplyMarkup(user.id, query.message.message_id)
+class BulkMenu(InlineMenu):
+	keyboard = [[("Orqaga", back())]]
+	text = ""
+	async def act(self, text):
+		return Message('wait for it')
 
+	async def handle_keyboard_pause(self):
+		pass
+
+	async def handle_keyboard_resume(self):
+		pass
 
 class BulkSendJob:
 	link = {}

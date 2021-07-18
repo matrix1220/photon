@@ -18,13 +18,13 @@ class sendMessage(Request):
 		keyboard_helper(kwargs)
 		Request.__init__(self, "sendMessage", {"chat_id":chat_id, "text":message, **kwargs})
 
-	def feed(self, **kwargs):
-		self.data['chat_id'] = self.data['chat_id'].format(**kwargs)
-		#self.data = format(self.data, **kwargs)
+	# def feed(self, **kwargs):
+	# 	self.data['chat_id'] = self.data['chat_id'].format(**kwargs)
+	# 	#self.data = format(self.data, **kwargs)
 
 class queuedSendMessage(sendMessage):
-	def __init__(self, chat_id, message, **kwargs):
-		sendMessage.__init__(self, chat_id, message, **kwargs)
+	def __init__(self, message, chat_id = "{chat_id}", **kwargs):
+		sendMessage.__init__(self, message, chat_id, **kwargs)
 		self.result = asyncio.Future()
 
 	def set_bot(self, bot):
@@ -50,9 +50,9 @@ class editMessageText(Request):
 		keyboard_helper(kwargs)
 		Request.__init__(self, "editMessageText", {"chat_id":chat_id, "message_id":message_id, "text":text, **kwargs})
 
-	def feed(self, **kwargs):
-		self.data['chat_id'] = self.data['chat_id'].format(**kwargs)
-		self.data['message_id'] = self.data['message_id'].format(**kwargs)
+	# def feed(self, **kwargs):
+	# 	self.data['chat_id'] = self.data['chat_id'].format(**kwargs)
+	# 	self.data['message_id'] = self.data['message_id'].format(**kwargs)
 
 class deleteMessage(Request):
 	def __init__(self, chat_id = "{chat_id}", message_id = "{message_id}"):

@@ -1,12 +1,12 @@
 
-from config import bot, languages
+from config import bot
 
 #from photon.client import inline_button
 #from photon.utils import format
 
 from photon import OutlineMenu, InlineMenu
 from photon.objects import Message
-from photon import key, act, explicit_act
+from photon import key, act, explicit_act, back
 
 #from photon.methods import sendMessage
 
@@ -62,6 +62,7 @@ class MainMenu(OutlineMenu):
 	]
 	async def act_(self, arg=None):
 		#if user.language==None: return manager.act(SelectLanguage)()
+		self.register()
 		return Message(f'Main Menu, arg={arg}')
 		# return Message('test bot', keyboard=keyboard)
 	async def handle_keyboard_button1(self):

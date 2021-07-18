@@ -28,4 +28,4 @@ class DynamicConfig:
 		del self._data[attr]
 
 
-dynamic_config = DynamicConfig()
+# dynamic_config = DynamicConfig()
