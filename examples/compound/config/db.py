@@ -2,7 +2,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker as _sessionmaker
 
-engine = create_engine('sqlite:///datebase.db', connect_args={'check_same_thread': False})
+from . import config
+
+engine = create_engine(*config.db.args, **config.db.kwargs)
 sessionmaker = _sessionmaker(bind=engine)
 
 #session = sessionmaker()

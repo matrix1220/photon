@@ -1,0 +1,5 @@
+debug: True
+token: 305643264:AAGwALg3QDiH2OrNzqehgoPdeXwpIqY416c
+db:
+  args: ['sqlite:///datebase.db']
+  kwargs: {'connect_args':{'check_same_thread': False}}
