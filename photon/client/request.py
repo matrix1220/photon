@@ -6,16 +6,16 @@ class Request(Exception):
 		self.method = method
 		self.data = data
 
-	def set_bot(self, bot):
-		self.bot = bot
-		return self
-
 	def feed(self, **kwargs):
 		self.data = format(self.data, **kwargs)
 
-	async def exec(self):
-		if not self.bot: raise Exception("bot is not set")
-		return await self.bot._send(self.method, self.data)
+	async def exec(self, bot=None):
+		if bot:
+			return await bot._send_request(self)
+		elif self.bot:
+			return await self.bot._send_request(self)
+		
+		raise Exception("Undefined bot")
 
 	def __await__(self):
 		return self.exec().__await__()

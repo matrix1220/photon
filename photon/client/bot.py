@@ -28,9 +28,13 @@ class Bot:
 			raise Exception(data.description, data.error_code)
 		return data.result
 
-	async def _send_response(self, response):
+	async def _send_response(self, response: dict):
 		if not response: return
 		return await self._send(response.pop('method'), response)
+	
+	async def _send_request(self, request: Request):
+		if not request or not isinstance(request, Request): return
+		return await self._send(request.method, request.data)
 
 	async def long_polling(self, skip_updates=True):
 		offset = None

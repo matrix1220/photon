@@ -21,7 +21,8 @@ class ContextManager:
 	def __init__(self, bot):
 		self.bot = bot
 		bot.context_manager = self
-		bot.handlers.append(self.handle_update)
+		bot.middlewares.append(self.middleware)
+		bot.handlers.append(self.handle)
 
 	# def _append_commit_list(self, item):
 	# 	self.commit_list.append(item)
@@ -38,16 +39,19 @@ class ContextManager:
 		#context.properties = self.find(metadata)
 		return context
 
-	async def handle_update(self, update):
-		metadata = self.parse(update)
-		if not metadata: return
+	async def middleware(self, next, ctx):
+		ctx.context = None
+		metadata = self.parse(ctx.update)
+		if not metadata: return next(ctx)
 		context = self.find(metadata)
-		if not context: return
-		#if not context: return
-		#context.properties = self.find(metadata)
-		#if not context.properties: return
-		result = await context.handle_update(update)
-		context.commit()
+		if not context: return next(ctx)
+		ctx.context = context
+		return next(ctx)
+
+	async def handle(self, ctx):
+		if not ctx.context: return
+		result = await ctx.context.handle_update(ctx.update)
+		ctx.context.commit()
 		#self.save(context)
 		return result 
 

@@ -11,11 +11,14 @@ from .menu import MenuStack
 #from .menu.menu_context import InlineMenuContext, OutlineMenuContext
 from .context_manager import ContextManager
 
+# class Ctx:
+# 	pass
 
 class Bot(Bot_):
 	def __init__(self, token):
 		super().__init__(token)
 		self.handlers = []
+		self.middlewares = []
 	
 	def set_main_menu(self, main_menu_):
 		self.main_menu = main_menu_
@@ -23,19 +26,37 @@ class Bot(Bot_):
 
 	async def long_polling(self, skip_updates=True):
 		async for update in Bot_.long_polling(self, skip_updates):
-			await self._handle_update(update)
+			ctx = object() #Ctx()
+			ctx.bot = self
+			ctx.update = update
+			temp = await self._next(iter(self.middlewares))(ctx)
+			await self._send_request(temp)
 			#asyncio.create_task(self._handle_update(update))
 
-	async def _handle_update(self, update):
+	def _next(self, iter_):
 		try:
-			for handler in self.handlers:
-				temp = await handler(update)
-				#print(temp)
-				if not temp: return
-				if not isinstance(temp, Request): return
-				await temp
-		except Exception as e:
-			logging.exception(e)
+			next_iter = next(iter_)
+			#next_ = self._next(iter_)
+			async def func(ctx):
+				next_ = self._next(iter_)
+				return await next_iter(next_, ctx)
+		except StopIteration:
+			next_iter = self._handle
+			async def func(ctx):
+				return await next_iter(ctx)
+
+		return func
+
+	async def _handle(self, ctx):
+		for handler in self.handlers:
+			try:
+				temp = await handler(ctx)
+			except Exception as e:
+				logging.exception(e)
+			
+			if not temp: continue
+			return temp
+	
 
 	def webhook(self, url):
 		pass
