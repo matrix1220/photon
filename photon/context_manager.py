@@ -18,8 +18,10 @@ contexts = {}
 #class ContextManager(MenuContextManager):
 
 class ContextManager:
-	# def __init__(self, bot):
-	# 	bot.context_manager = self
+	def __init__(self, bot):
+		self.bot = bot
+		bot.context_manager = self
+		bot.handlers.append(self.handle_update)
 
 	# def _append_commit_list(self, item):
 	# 	self.commit_list.append(item)

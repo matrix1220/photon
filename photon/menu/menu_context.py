@@ -75,7 +75,7 @@ class OutlineMenuContext(Outline, MenuContext):
 		if text:=message.text:
 			if self.keyboard!=None and text in self.keyboard:
 				key = self.keyboard[text]
-				result = await menu_object.handle_keyboard(key)
+				result = await menu_object.handle('keyboard', key)
 				#return result
 				if result!=False: return result
 

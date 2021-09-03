@@ -13,20 +13,9 @@ from .context_manager import ContextManager
 
 
 class Bot(Bot_):
-	def __init__(self, token, context_manager=None):
+	def __init__(self, token):
 		super().__init__(token)
-		if context_manager==None:
-			self.context_manager = ContextManager()
-		else:
-			self.context_manager = context_manager
-
-		self.context_manager.bot = self
-
-		self.handler = self.context_manager.handle_update
-		#self.context_manager = self._new_context_manager()
-
-	# def _new_context_manager(self):
-	# 	self.context_manager = ContextManager(self)
+		self.handlers = []
 	
 	def set_main_menu(self, main_menu_):
 		self.main_menu = main_menu_
@@ -39,21 +28,14 @@ class Bot(Bot_):
 
 	async def _handle_update(self, update):
 		try:
-			temp = await self.handler(update)
-			#print(temp)
-			if not temp: return
-			if not isinstance(temp, Request): return
-			await temp
+			for handler in self.handlers:
+				temp = await handler(update)
+				#print(temp)
+				if not temp: return
+				if not isinstance(temp, Request): return
+				await temp
 		except Exception as e:
 			logging.exception(e)
 
 	def webhook(self, url):
 		pass
-
-	# def handler(self, update):
-	# 	context_metadata = self.context_manager.parse_metadata(update)
-	# 	if not context_metadata: return
-	# 	context = self.context_manager.find(**context_metadata)
-	# 	request = context.handle_update(update)
-	# 	context.close()
-	# 	return request

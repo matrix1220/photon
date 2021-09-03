@@ -9,3 +9,6 @@ plan:
  bot.on... handlers
  functions
  dynamic keyboards, messages
+ context based menus
+ keyboard handler act formatter
+ come back with parameters

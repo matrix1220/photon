@@ -28,13 +28,13 @@ class Menu:
 	def text_(self):
 		return self.text
 		
-	def __getattribute__(self, key):
-		if key.startswith("handle"):
-			async def handle(*args, **kwargs):
-				result = await catch(object.__getattribute__(self, key), *args, **kwargs)
-				return self.complete_result(result)
-			return handle
-		return object.__getattribute__(self, key)
+	# def __getattribute__(self, key):
+	# 	if key.startswith("handle"):
+	# 		async def handle(*args, **kwargs):
+	# 			result = await catch(object.__getattribute__(self, key), *args, **kwargs)
+	# 			return self.complete_result(result)
+	# 		return handle
+	# 	return object.__getattribute__(self, key)
 
 	
 	def __init_subclass__(menu_class, **kwargs):
@@ -58,29 +58,29 @@ class Menu:
 	async def act(self, *args, **kwargs):
 		self._explicit = False
 		self._init(*args, **kwargs)
-		result = await catch(self._act, *args, **kwargs)
+		result = await catch(self._act)
 		return self.complete_result(result)
 
 	async def explicit_act(self, *args, **kwargs):
 		self._explicit = True
 		self._init(*args, **kwargs)
-		result = await catch(self._act, *args, **kwargs)
+		result = await catch(self._act)
 		return self.complete_result(result)
 
 	async def reset(self, *args, **kwargs):
 		self.context.menu_stack.reset()
 		return await self.explicit_act(*args, **kwargs)
 
-	async def _act(self, *args, **kwargs):
+	async def _act(self):
 		pass
 
 	async def handle_key(self, key, *args, **kwargs):
-		if not hasattr(self, f"handle_key_{key}"): return
-		return await getattr(self, f"handle_key_{key}")(*args, **kwargs)
+		return await self.handle(f"key_{key}", *args, **kwargs)
 
 	async def handle(self, key, *args, **kwargs):
 		if not hasattr(self, f"handle_{key}"): return
-		return await getattr(self, f"handle_{key}")(*args, **kwargs)
+		result = await catch(getattr(self, f"handle_{key}"), *args, **kwargs)
+		return self.complete_result(result)
 
 	async def exec(self, result):
 		result = self.complete_result(result)
@@ -108,14 +108,21 @@ class Menu:
 			target, args, kwargs = rest
 			return await self.handle_key(target, *args, **kwargs)
 		elif key_==1:
-			target, args, kwargs = rest
-			return await self.context.act(menu_classes[target], *args, **kwargs)
+			id_, args, kwargs = rest
+			return await self.context.act(menu_classes[id_], *args, **kwargs)
 		elif key_==2:
-			target, args, kwargs = rest
-			return await self.context.explicit_act(menu_classes[target], *args, **kwargs)
+			id_, args, kwargs = rest
+			return await self.context.explicit_act(menu_classes[id_], *args, **kwargs)
 		elif key_==3:
+			id_, args, kwargs = rest
+			return await self.context.reset(menu_classes[id_], *args, **kwargs)
+		elif key_==4:
+			id_, args, kwargs = rest
+			#return await self.context.reset(functions[id_], *args, **kwargs)
+		elif key_==5:
 			return await self.back()
-
+		elif key_==6:
+			return False
 
 	async def _back(self):
 		pass
