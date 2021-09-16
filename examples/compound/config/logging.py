@@ -1,7 +1,6 @@
-
+from . import config
 import logging
-if debug:
-	logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(**config.logging)
+
+if config.debug:
 	logging.getLogger('hpack').setLevel(logging.ERROR)
-else:
-	logging.basicConfig(filename='app.log', filemode='w', level=logging.ERROR)
