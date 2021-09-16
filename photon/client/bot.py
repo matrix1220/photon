@@ -66,7 +66,8 @@ class Bot:
 
 
 	def __getattr__(self, key):
-		# def function(*args, **kwargs):
-		# 	return request(key, args, kwargs).set_bot(self)
-		# return function
-		return lambda *args, **kwargs: request(key, args, kwargs).set_bot(self)
+		def function(*args, **kwargs):
+			request_ = request(key, args, kwargs)
+			request_.bot = self
+			return request_
+		return function

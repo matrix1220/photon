@@ -4,11 +4,10 @@ from photon.object_dict import objectify
 config = objectify(yaml.load(open('config.yaml').read(), Loader=yaml.Loader))
 
 import logging
+logging.basicConfig(**config.logging)
+
 if config.debug:
-	logging.basicConfig(level=logging.DEBUG)
 	logging.getLogger('hpack').setLevel(logging.ERROR)
-else:
-	logging.basicConfig(filename='app.log', filemode='w', level=logging.ERROR)
 
 
 from sqlalchemy import create_engine

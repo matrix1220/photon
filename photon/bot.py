@@ -11,22 +11,18 @@ from .menu import MenuStack
 #from .menu.menu_context import InlineMenuContext, OutlineMenuContext
 from .context_manager import ContextManager
 
-# class Ctx:
-# 	pass
+class Ctx:
+	pass
 
 class Bot(Bot_):
 	def __init__(self, token):
 		super().__init__(token)
 		self.handlers = []
 		self.middlewares = []
-	
-	def set_main_menu(self, main_menu_):
-		self.main_menu = main_menu_
-		return main_menu_
 
 	async def long_polling(self, skip_updates=True):
 		async for update in Bot_.long_polling(self, skip_updates):
-			ctx = object() #Ctx()
+			ctx = Ctx()
 			ctx.bot = self
 			ctx.update = update
 			temp = await self._next(iter(self.middlewares))(ctx)

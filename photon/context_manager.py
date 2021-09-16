@@ -55,13 +55,6 @@ class ContextManager:
 		#self.save(context)
 		return result 
 
-	# def create(self, metadata):
-	# 	if "chat_id" not in metadata: return
-	# 	if "message_id" in metadata:
-	# 		return self.instantiate(InlineMenuContext, metadata)
-
-	# 	return self.instantiate(OutlineMenuContext, metadata)
-
 	def find_inline(self, metadata):
 		pass
 		# chat_id = metadata['chat_id']
@@ -96,24 +89,6 @@ class ContextManager:
 			return self.find_inline(metadata)
 			
 		return self.find_outline(metadata)
-		
-
-	# def save(self, context_properties_):
-	# 	metadata = context_properties_.metadata
-	# 	if "chat_id" in metadata:
-	# 		chat_id = metadata['chat_id']
-	# 		if "message_id" in metadata:
-	# 			message_id = metadata['message_id']
-	# 			key = f"chat_id:{chat_id}:message_id:{message_id}"
-	# 			context_properties[key] = context_properties_
-	# 			return
-
-	# 		key = f"chat_id:{chat_id}"
-	# 		context_properties[key] = context_properties_
-	# 		return
-
-	# def exists(self, metadata):
-	# 	pass
 
 	def parse(self, update):
 		metadata = None
