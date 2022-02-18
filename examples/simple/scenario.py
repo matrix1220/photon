@@ -12,7 +12,7 @@ from photon import key, act, explicit_act, back
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger('hpack').setLevel(logging.ERROR)
 
-bot = photon.Bot("305643264:AAGwALg3QDiH2OrNzqehgoPdeXwpIqY416c")
+bot = photon.Bot("305643264:AAHoW3g1QO-XQk2-I-iQpwongbDlHBZ2t5A")
 photon.ContextManager(bot)
 
 class TestMenu(OutlineMenu):
@@ -33,10 +33,9 @@ class MainMenu(OutlineMenu):
 
 handlers = photon.OnHandlers(bot)
 @handlers.on("message")
-def start(ctx, message):
-	print("test")
-	if message=="/start":
-		return ctx.context.act(MainMenu)
+async def start(request, message):
+	#await bot.sendMessage('salom', "108268232")
+	return request.context.act(MainMenu)
 
 async def main():
 	await bot.long_polling()

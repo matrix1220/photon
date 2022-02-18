@@ -3,12 +3,11 @@ class OnHandlers:
         bot.handlers.append(self._handle)
         self.handlers = {}
 
-    async def _handle(self, ctx):
-        print('test')
-        for key, value in ctx.update.items():
+    async def _handle(self, request):
+        for key, value in request.update.items():
             if key=='update_id': continue
             if key not in self.handlers: return
-            return await self.handlers[key](value)
+            return await self.handlers[key](request, value)
 
     def on(self, key):
         def func(handler):
