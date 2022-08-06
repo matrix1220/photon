@@ -1,13 +1,9 @@
-from ..utils import format
 
 class Request(Exception):
 	def __init__(self, method, data):
 		self.bot = None
 		self.method = method
 		self.data = data
-
-	def feed(self, **kwargs):
-		self.data = format(self.data, **kwargs)
 
 	async def exec(self, bot=None):
 		if bot:

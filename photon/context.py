@@ -1,41 +1,30 @@
 
-
-from .client import unserialize_callback_data
+#from .context_vars import state
+#from photon.client.request import request
+from photon.client.methods import sendMessage
 
 class Context:
-	def __init__(self):
-		self.commit_list = []
-
-	def _append_commit_list(self, item):
-		self.commit_list.append(item)
-
-	def commit(self):
-		for item in self.commit_list:
-			item.commit()
-
-	def instantiate(self, class_, args = [], kwargs = {}):
-		object_ = class_(self)
-		object_._init(*args, **kwargs)
-		#object_.context_manager = self.manager
-
-		return object_
-
-	async def handle_message(self, message):
-		# result = await self.pass_message(_MessageHandler, message)
-		# if result: return result
-		return await self.handle_outline_menu(message)
-
-	async def handle_callback_query(self, callback_query):
-		if data := callback_query.data:
-			callback_query.data = unserialize_callback_data(data)
-			return await self.handle_inline_menu(callback_query)
-			#menu_object = self.instantiate(menu_classes[data.pop(0)])
-			#return await catch_request(handler.handle_callback, [callback_query, data])
-	
-	async def handle_update(self, update):
-		# bug
-		for x in ["message", "callback_query"]:
-			if x not in update: continue
-			return await getattr(self, f"handle_{x}")(update[x])
+    def __init__(self, chat_id, message):
+        self.chat_id = chat_id
+        self.message = message
+    
+    def transform(self, message, keyboard=None):
+        kwargs = {}
+        if keyboard: kwargs['keyboard'] = keyboard
+        return sendMessage(message, self.chat_id, **kwargs )
 
 
+class ContextExtractor:
+    def __init__(self, ):
+        pass
+    
+    def extract(self, update):
+        return _extract_context(update)
+
+def _extract_context(update):
+    if "message" in update:
+        context = Context(
+            update["message"]["chat"]["id"],
+            update["message"]["text"],
+        )
+        return context

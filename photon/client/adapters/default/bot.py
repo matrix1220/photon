@@ -1,5 +1,6 @@
-from ..object_dict import objectify, dictify
+
 import requests_async as requests
+#import requests
 
 from .message_queue import QueuedMessage, MessageQueue
 from .request import Request, request
@@ -20,13 +21,13 @@ class Bot:
 		logger.debug([method, args])
 		#self.session
 		result = await requests.post(f'https://api.telegram.org/bot{self.token}/{method}', json=args)
-		data = objectify(result.json())
+		data = result.json()
 		logger.debug(data)
 
-		if not data.ok:
-			logger.error(data.description)
-			raise Exception(data.description, data.error_code)
-		return data.result
+		if not data['ok']:
+			logger.error(data['description'])
+			raise Exception(data['description'], data['error_code'])
+		return data['result']
 
 	async def _send_response(self, response: dict):
 		if not response: return
@@ -45,12 +46,12 @@ class Bot:
 
 		while offset==None:
 			async for update in self.safeGetUpdates(**kwargs):
-				offset = update.update_id
+				offset = update['update_id']
 				yield update
 
 		while True:
 			async for update in self.safeGetUpdates(offset=offset + 1, timeout=30):
-				offset = update.update_id
+				offset = update['update_id']
 				yield update
 
 	async def safeGetUpdates(self, **kwargs):
