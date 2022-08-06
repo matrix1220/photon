@@ -1,3 +1,4 @@
 photon.egg-info
 __pycache__
 trash
+.env
