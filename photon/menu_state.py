@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 from .context_vars import state
-from .context import Context
+from .client.domain.context import Context
 #from .state import State
 
 from .menu import Menu
@@ -21,8 +21,7 @@ class MenuEntry:
         self.menu_state = MenuState()
 
 class MenuEntryStack:
-    def __init__(self, menu_registry: MenuRegistry, stack: list):
-        self.menu_registry = menu_registry
+    def __init__(self, stack: list):
         self.stack = stack
     
     def new(self, menu: Menu) -> MenuEntry:
@@ -44,14 +43,12 @@ class MenuEntryStack:
 
 
 class MenuEntryStackRepository:
-    def __init__(self, menu_registry: MenuRegistry):
-        self.menu_registry = menu_registry
+    def __init__(self):
         self.set = {}
 
     def get(self, context: Context) -> MenuEntryStack:
         if context.chat_id not in self.set:
             self.set[context.chat_id] = MenuEntryStack(
-                menu_registry=self.menu_registry,
                 stack=[]
             )
 

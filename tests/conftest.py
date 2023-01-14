@@ -3,16 +3,16 @@ from pytest_asyncio import fixture as async_fixture
 
 from dotenv import dotenv_values
 
-from photon.client.bot import Bot
+#from photon.client.bot import Bot
 
 from photon.menu import MenuEntryStackRepository, MenuRegistry
 
 from photon.context_vars import update as update_
 
 from photon.state import StateRepository
-from photon.context import ContextExtractor
+from photon.client.domain.context import ContextExtractor
 
-from photon.context import extract_context
+from photon.client.domain.context import extract_context
 from photon.state import get_state
 
 config = dotenv_values(".env")
@@ -20,7 +20,8 @@ config = dotenv_values(".env")
 @fixture
 def bot():
     token = config['TOKEN']
-    return Bot(token)
+    return
+    #return Bot(token)
 
 @fixture
 def menu_registry():

@@ -1,44 +1,49 @@
 
-from photon.client.bot import Bot
-from photon.menu_state import MenuRegistry
+
 from photon.menu_state import MenuEntryStackRepository
 
-from photon.context import extract_context
+from photon.client.domain.context import extract_context
 from photon.state import get_state
 from asyncio import run
 
 import os
+import logging
 from dotenv import load_dotenv
+
+from aiogram import Bot, Dispatcher, executor, types
+
+from .scenario import main_menu
 
 load_dotenv()
 
 token = os.getenv("TOKEN")
-bot = Bot(token)
 
-menu_registry = MenuRegistry()
-menu_entry_stack_repository = MenuEntryStackRepository(
-    menu_registry=menu_registry,
-)
-from .scenario import main_menu
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
-async def start_message_handler(update):
-    state = get_state(update)
-    state.get(main_menu).call("asd")
-    #await main_menu.call().exec(bot)
+# Initialize bot and dispatcher
+bot = Bot(token=token)
+dp = Dispatcher(bot)
 
-async def all_message_handler(update):
-    state = get_state(menu_entry_stack_repository, update)
-    await state.handle().exec(bot) 
+menu_entry_stack_repository = MenuEntryStackRepository()
 
-# async def main():
-#     async for update__ in bot.long_polling():
-#         state = get_state(menu_entry_stack_repository, update__)
-#         if update__['message']['text'] == '/start':
-#             await main_menu.call().exec(bot)
-#             continue 
-        
-#         await state.handle().exec(bot) 
-#         #update_.set(update__)
-#         #return update__
 
-#run(main())
+@dp.message_handler(commands=['start'])
+async def send_welcome(message: types.Message):
+    context = extract_context(message)
+    state = get_state(context) # aquire state somehow
+    response = state.get(main_menu).call("asd") # get response somehow
+    return context.handle(response)
+
+
+@dp.message_handler()
+async def echo(message: types.Message):
+    context = extract_context(message)
+    state = get_state(context)
+
+    response = await state.handle()
+    return context.handle(response)
+
+
+if __name__ == '__main__':
+    executor.start_polling(dp, skip_updates=True)

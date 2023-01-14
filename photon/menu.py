@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 from .context_vars import state
-from .context import Context
+from .client.domain.context import Context
 #from .state import State
 
 class Representable:
@@ -47,6 +47,9 @@ class Keyboard(Representable):
 class MenuBase(Representable):
     pass
 
+class Response:
+    pass
+
 class Menu:
     def __init__(self, message, keyboard: Keyboard):
         self.message = message
@@ -56,20 +59,19 @@ class Menu:
         context_: Context = state.context
         return context_.transform(self.message, self.keyboard.represent())
     
-    def back(self, state, *args, **kwargs):
+    def back(self, state, *args, **kwargs) -> Response:
         return self.function(state)
     
-    def handle(self, state):
+    def handle(self, state) -> Response:
         context_: Context = state.context
         #context_.transform()
         return self.keyboard.handle(context_.message)
     
     # helper functions
-    def call(self, *args, **kwargs):
-        #state_: State = state.get()
-        state_ = state.get()
+    def call(self, state, *args, **kwargs) -> Response:
+
         #menu_entry_stack_: MenuEntryStack = menu_entry_stack.get()
-        menu_entry = state_.menu_entry_stack.new(self)
+        menu_entry = state.menu_entry_stack.new(self)
         menu_state = menu_entry.menu_state
         menu_state.args, menu_state.kwargs = args, kwargs
         result = self.function(menu_state)

@@ -1,6 +1,6 @@
 
 from .context_vars import state #, update, context, 
-from .context import Context, _extract_context
+from .client.domain.context import Context, _extract_context
 from .menu_state import MenuEntry, MenuEntryStack, MenuEntryStackRepository
 
 class State:

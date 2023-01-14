@@ -1,6 +1,5 @@
 
-#from .context_vars import state
-#from photon.client.request import request
+
 from photon.client.methods import sendMessage
 
 class Context:
